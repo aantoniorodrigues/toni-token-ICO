@@ -2,5 +2,5 @@
 const ToniToken = artifacts.require("ToniToken");
 
 module.exports = function (deployer) {
-  deployer.deploy(ToniToken);
+  deployer.deploy(ToniToken, 1000000);    // the extra arguments are passed to the constructor
 };
