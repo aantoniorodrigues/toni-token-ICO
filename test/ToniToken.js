@@ -15,7 +15,7 @@ contract('ToniToken', (accounts) => {
         assert.notEqual(address, undefined);
     })
 
-    // Test to see if the total supply is correct.
+    // Test if the total supply is correct.
     it('sets correct total supply of 1M tokens', async () => {
         // Get the smart contract's total supply.
         let totalSupply = await this.ToniToken.totalSupply();
@@ -23,7 +23,7 @@ contract('ToniToken', (accounts) => {
         assert.equal(totalSupply.toNumber(), 1000000, 'sets correct total supply');
     })
 
-    // Test to see if the total supply was allocated to the creator's account.
+    // Test if the total supply was allocated to the creator's account.
     it('allocates total supply to correct account', async () => {
         // Get the account's balance of the contract's creator.
         let creatorBalance = await this.ToniToken.balanceOf(accounts[0]);
@@ -31,7 +31,7 @@ contract('ToniToken', (accounts) => {
         assert.equal(creatorBalance.toNumber(), 1000000, 'initial supply correctly allocated');
     })
 
-    // Test to see if the token's name and symbol are correct.
+    // Test if the token's name and symbol are correct.
     it('sets name and symbol correctly', async () => {
         // Get token's name, symbol and standard.
         let name = await this.ToniToken.name();
@@ -39,5 +39,30 @@ contract('ToniToken', (accounts) => {
         // Check if they have the correct values.
         assert.equal(name, 'ToniToken', 'token with the correct name');
         assert.equal(symbol, 'TT', 'token with the correct symbol');
+    })
+
+    // Test if an account's able to transfer more tokens than the ones it owns.
+    it('not allowed to transfer more tokens than the ones it owns', () => {
+        return this.ToniToken.transfer.call(accounts[1], 999999999).then(assert.fail).catch((error) => {
+            assert(error.message.indexOf('revert') >= 0, 'error message must contain revert');
+        });
+    })
+
+    // Test the transfer function.
+    it('transfer function', async () => {
+        let transferReceipt = await this.ToniToken.transfer(accounts[1], 250000, { from: accounts[0] });
+        assert.equal(transferReceipt.logs.length, 1, 'triggers an event');
+        assert.equal(transferReceipt.logs[0].event, 'Transfer', 'triggers a "transfer" event');
+        assert.equal(transferReceipt.logs[0].args._from, accounts[0], 'logs the account the tokens are transferred from');
+        assert.equal(transferReceipt.logs[0].args._to, accounts[1], 'logs the account the tokens are transferred to');
+        assert.equal(transferReceipt.logs[0].args._value, 250000, 'logs the transfer amount');
+
+        let receiverBalance = await this.ToniToken.balanceOf(accounts[1]);
+        let senderBalance = await this.ToniToken.balanceOf(accounts[0]);
+        assert.equal(receiverBalance.toNumber(), 250000, 'adds the ammount to the receiver account');
+        assert.equal(senderBalance.toNumber(), 750000, 'deducts the ammount from sender account');
+        // Check if it returns a boolean.
+        let output = await this.ToniToken.transfer.call(accounts[1], 250000);
+        assert.equal(output, true, 'returns true');
     })
 })
