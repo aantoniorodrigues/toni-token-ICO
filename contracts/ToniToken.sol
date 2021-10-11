@@ -39,7 +39,7 @@ contract ToniToken {
     function transfer(address _to, uint256 _value) public returns (bool success) {
         // Throws an exception if the sender doesn't own enough tokens.
         require(balanceOf[msg.sender] >= _value);
-        //Deduct the value from sender and add it to receiver.
+        // Deduct the value from sender and add it to receiver.
         balanceOf[_to] += _value;
         balanceOf[msg.sender] -= _value;
         // Trigger a "Transfer" event.
@@ -60,6 +60,17 @@ contract ToniToken {
 
     // Transfer tokens on behalf of another account.
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
+        // Throws an exception if the transfer value's greater than the account's balance.
+        require(balanceOf[_from] >= _value);
+        // Throws an exception if the spender tries to transfer more than the value it's allowed to.
+        require(allowance[_from][msg.sender] >= _value);
+        
+        // Deduct the value from sender and add it to receiver.
+        balanceOf[_to] += _value;
+        balanceOf[_from] -= _value;
+        // Update the allowance.
+        allowance[_from][msg.sender] -= _value;
+
         // Trigger a "Transfer" event.
         emit Transfer(_from, _to, _value);
         // Return a boolean value (mandatory in ERC20 token protocol).
