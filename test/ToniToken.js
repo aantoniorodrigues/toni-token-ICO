@@ -6,9 +6,10 @@ contract('ToniToken', (accounts) => {
     })
 
     // Test to see if the smart contract is deployed correctly.
-    it('deploys smart contract succesfully', async () => {
+    it('deploys the smart contract succesfully', async () => {
         // Get the smart contract's address.
         let address = await this.ToniToken.address;
+        // Check if it's a valid address.
         assert.notEqual(address, 0x0);
         assert.notEqual(address, '');
         assert.notEqual(address, null);

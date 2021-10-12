@@ -64,7 +64,7 @@ contract ToniToken {
         require(balanceOf[_from] >= _value);
         // Throws an exception if the spender tries to transfer more than the value it's allowed to.
         require(allowance[_from][msg.sender] >= _value);
-        
+
         // Deduct the value from sender and add it to receiver.
         balanceOf[_to] += _value;
         balanceOf[_from] -= _value;
@@ -76,5 +76,4 @@ contract ToniToken {
         // Return a boolean value (mandatory in ERC20 token protocol).
         return true;
     }
-
 }
