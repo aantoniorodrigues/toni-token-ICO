@@ -29,7 +29,7 @@ contract ToniToken {
 
     // Only runs when the contract is deployed.
     constructor(uint256 _totalSupply) public {
-        // Allocate the initial total supply to the account that deploys the contract.
+        // Allocate the initial total supply to the account deploying the contract.
         balanceOf[msg.sender] = _totalSupply;
         // Set the total supply to the number given in the constructor's argument.
         totalSupply = _totalSupply;
