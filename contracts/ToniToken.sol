@@ -14,13 +14,13 @@ contract ToniToken {
     // Mapping to store account's allowance (substitutes the mandatory "allowance" function).
     mapping(address => mapping(address => uint256)) public allowance;   // mapping structure: owner => { spender: value}
 
-    // Event to be triggered when a transfer is made.
+    // To be triggered when a transfer is made.
     event Transfer(
         address indexed _from,
         address indexed _to,
         uint256 _value
     );
-    // Event to be triggered when a delegated transfer is approved.
+    // To be triggered when a delegated transfer is approved.
     event Approval(
         address indexed _owner,
         address indexed _spender,

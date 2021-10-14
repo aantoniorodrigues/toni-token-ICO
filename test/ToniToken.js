@@ -5,7 +5,7 @@ contract('ToniToken', (accounts) => {
         this.ToniToken = await ToniToken.deployed();
     })
 
-    // Test to see if the smart contract is deployed correctly.
+    // Test if the smart contract is deployed correctly.
     it('deploys the smart contract succesfully', async () => {
         // Get the smart contract's address.
         let address = await this.ToniToken.address;
