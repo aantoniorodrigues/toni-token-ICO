@@ -46,16 +46,21 @@ contract('ToniTokenICO', (accounts) => {
 
     // Test the "buyToken" function.
     it('buyToken function works correctly', async () => {
-        // Try to buy tokens sending the wrong value in ether and check if an exception is thrown.
+        // Transfer 500000 tokens to the ICO contract.
+        await this.ToniToken.transfer(this.ToniTokenICO.address, tokensAvailable, { from: admin });
+        // Correct value to be send to the ICO contract (in wei).
+        let value = numberOfTokens * tokenPrice;
+
+        // Try to buy tokens sending the wrong value in ether and check for a revert transaction.
         await this.ToniTokenICO.buyTokens(numberOfTokens, { from: buyer, value: 1}).then(assert.fail).catch((error) => {
             assert(error.message.indexOf('revert') >= 0, 'value must equal number of tokens in wei');
         })
 
-        // Transfer 500000 tokens to the ICO contract.
-        await this.ToniToken.transfer(this.ToniTokenICO.address, tokensAvailable, { from: admin });
+        // Try to buy more tokens than the tokens available and check for a revert transaction.
+        await this.ToniToken.buyTokens(tokensAvailable + 1, { from: buyer, value: value}).then(assert.fail).catch((error) => {
+            assert(error.message.indexOf('revert') >= 0, 'unable to buy more tokens than the ones available');
+        })
 
-        // Correct value to be send to the ICO contract (in wei).
-        let value = numberOfTokens * tokenPrice;
         // Buy 10 tokens with the buyer account and get the transaction receipt.
         let transactionReceipt = await this.ToniTokenICO.buyTokens(numberOfTokens, { from: buyer, value: value});
         // Check if receipt has the correct data.
@@ -63,6 +68,14 @@ contract('ToniTokenICO', (accounts) => {
         assert.equal(transactionReceipt.logs[0].event, 'Sell', 'triggers a "Sell" event');
         assert.equal(transactionReceipt.logs[0].args._buyer, buyer, 'registers the buyer');
         assert.equal(transactionReceipt.logs[0].args._amount, numberOfTokens, 'registers the number of tokens sold');
+
+        // Get the balance of the ICO contract and check if it was updated correctly.
+        let contractBalance = await this.ToniToken.balanceOf(this.ToniTokenICO.address);
+        assert.equal(contractBalance.toNumber(), tokensAvailable - numberOfTokens, 'updates contract balance correctly');
+        
+        // Get the buyer's balance and check if it was updated correctly.
+        let buyerBalance = await this.ToniToken.balanceOf(buyer);
+        assert.equal(buyerBalance.toNumber(), numberOfTokens, 'updates buyer balance correctly');
         
         // Get the number of tokens sold and check if it was updated correctly.
         let tokensSold = await this.ToniTokenICO.tokensSold();
