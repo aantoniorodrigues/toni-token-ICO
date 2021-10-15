@@ -41,15 +41,19 @@ contract ToniTokenICO {
 
     // Allows an account to buy a number of tokens.
     function buyTokens(uint256 _numberOfTokens) public payable {    // "payable" to enable ether transactions
-        // Tokens correct ether value (in wei).
+        // Correct ether value (in wei) of the required tokens.
         uint256 _correctValue = multiply(_numberOfTokens, tokenPrice);
+        
         // Throws exception if the value the buyer is sending is different from the correct value.
         require(msg.value == _correctValue);
         // Throws exception if contract does not have enough tokens.
-
+        require(_numberOfTokens <= tokenContract.balanceOf(this));
+        // Throws exception if no transfer was made.
+        require(tokenContract.transfer(msg.sender, _numberOfTokens));
 
         // Update the number of tokens sold.
         tokensSold += _numberOfTokens;
+        
         // Emit a "Sell" event.
         emit Sell(msg.sender, _numberOfTokens);
     }
