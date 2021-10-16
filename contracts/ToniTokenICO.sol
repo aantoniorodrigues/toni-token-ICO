@@ -47,7 +47,7 @@ contract ToniTokenICO {
         // Throws exception if the value the buyer is sending is different from the correct value.
         require(msg.value == _correctValue);
         // Throws exception if contract does not have enough tokens.
-        require(_numberOfTokens <= tokenContract.balanceOf(this));
+        require(_numberOfTokens <= tokenContract.balanceOf(address(this)));    // address(this) accesses this contract's address
         // Throws exception if no transfer was made.
         require(tokenContract.transfer(msg.sender, _numberOfTokens));
 
@@ -56,5 +56,14 @@ contract ToniTokenICO {
         
         // Emit a "Sell" event.
         emit Sell(msg.sender, _numberOfTokens);
+    }
+
+    // Ends the token sale (can only be called by the admin).
+    function endSale() public {
+        // Throws exception if function is not called by the admin.
+        require(msg.sender == admin);
+        // Transfer the remaining tokens to the admin.
+        require(tokenContract.transfer(admin, tokenContract.balanceOf(address(this))));
+        // Destroy the ICO contract when sale ends.
     }
 }
