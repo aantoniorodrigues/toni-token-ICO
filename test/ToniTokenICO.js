@@ -101,6 +101,9 @@ contract('ToniTokenICO', (accounts) => {
         let adminBalance = await this.ToniToken.balanceOf(admin);
         assert.equal(adminBalance.toNumber(), totalSupply - numberOfTokensBought, 'transfers the remaining tokens to the admin account');
 
-        // Check if contract is destroyed when the sale ends.
+        // Check if contract is destroyed/disabled when the sale ends by checking the token price.
+        let price = await this.ToniTokenICO.tokenPrice();
+        assert.equal(price.toNumber(), 0, 'token price reseted');
+
     })
 })
