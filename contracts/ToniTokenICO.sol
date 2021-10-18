@@ -64,6 +64,7 @@ contract ToniTokenICO {
         require(msg.sender == admin);
         // Transfer the remaining tokens to the admin.
         require(tokenContract.transfer(admin, tokenContract.balanceOf(address(this))));
-        // Destroy the ICO contract when sale ends.
+        // Disable the ICO contract when sale ends.
+        selfDestruct(admin);
     }
 }
