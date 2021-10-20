@@ -7,7 +7,7 @@ import './ToniToken.sol';
 contract ToniTokenICO {
 
     // Variable to store the administrator's address.
-    address admin;      // not public because it's not to be exposed
+    address payable admin;      // not public because it's not to be exposed
     // Variable to store the token price.
     uint256 public tokenPrice;     // token price has to defined in wei
     // Variable to store the number of tokens sold.
@@ -65,6 +65,6 @@ contract ToniTokenICO {
         // Transfer the remaining tokens to the admin.
         require(tokenContract.transfer(admin, tokenContract.balanceOf(address(this))));
         // Disable the ICO contract when sale ends.
-        selfDestruct(admin);
+        selfdestruct(admin);
     }
 }

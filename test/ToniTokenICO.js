@@ -87,7 +87,7 @@ contract('ToniTokenICO', (accounts) => {
     it('endSale function works correctly', async () => {
         // Try to call function not being the admin and check for a revert transaction.
         await this.ToniTokenICO.endSale({ from: buyer}).then(assert.fail).catch((error) => {
-            assert(error.message.indexOf('revert') >= 0, 'non-admin accounts unable to end the sale');
+            assert(error.message.indexOf('revert') >= 0, 'non-admin accounts are unable to end the sale');
         })
 
         // End sale with admin account and get transaction receipt.
@@ -101,9 +101,10 @@ contract('ToniTokenICO', (accounts) => {
         let adminBalance = await this.ToniToken.balanceOf(admin);
         assert.equal(adminBalance.toNumber(), totalSupply - numberOfTokensBought, 'transfers the remaining tokens to the admin account');
 
-        // Check if contract is destroyed/disabled when the sale ends by checking the token price.
-        let price = await this.ToniTokenICO.tokenPrice();
-        assert.equal(price.toNumber(), 0, 'token price reseted');
+        // Check if contract is destroyed/disabled by being unable to call the token price.
+        await this.ToniTokenICO.tokenPrice().then(assert.fail).catch((error) => {
+            assert(error.message, 'contract disabled');
+        })
 
     })
 })
