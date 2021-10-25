@@ -5,14 +5,14 @@ App = {
     account: '0x0',
     // Loading status of the app.
     loading: false,
-
+    // Variable to store the token's price.
     tokenPrice: 0,
 
     // Initializes the app.
     init: async () => {
+		// Call all the necessary methods.
         await App.initWeb3();
         await App.initContracts();
-
         await App.render();
     },
 
@@ -90,13 +90,14 @@ App = {
         App.tokenPrice = await App.toniTokenICO.tokenPrice();
         let tokensSold = await App.toniTokenICO.tokensSold();
         let balance = await App.toniToken.balanceOf(App.account);
-        let tokensAvailable = 750000;
+		console.log(balance.toNumber());
+        let tokensAvailable = 500000;
 
         // Update the HTML elements with the correct values.
         $('.token-price').html(web3.fromWei(App.tokenPrice, 'ether').toNumber());
         $('.tokens-sold').html(tokensSold.toNumber());
         $('.tokens-available').html(tokensAvailable - tokensSold);
-        $('.dapp-balance').html(balance.toNumber());
+        $('.toni-token-balance').html(balance.toNumber());
 
         // Compute and update the progress bar with the correct percentage.
         let progressPercentage = (tokensSold / tokensAvailable) * 100;
@@ -118,8 +119,10 @@ App = {
             value: numberOfTokens * App.tokenPrice,
             gas: 500000
         }).then(() => { console.log('tokens bought')});
-        // Reset the form.
+        
+		// Reset the form.
         $('form').trigger('reset');
+		// Reload the app's content and hide the loader.
         $('#content').show();
         $('#loader').hide();
     },

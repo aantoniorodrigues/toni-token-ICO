@@ -1,0 +1,4 @@
+- let toniToken = await ToniToken.deployed();
+- let toniTokenICO = await ToniTokenICO.deployed();
+- let admin = 'copy paste account address';
+- toniToken.transfer(toniTokenICO.address, 500000, { from: admin });

@@ -13,7 +13,7 @@ contract('ToniTokenICO', (accounts) => {
     let totalSupply = 1000000;    // total number of tokens in existence
     let admin = accounts[0];    // deployer of the token contract (owner of the total supply)
     let buyer = accounts[1];    // account buying tokens
-    let tokensAvailable = 500000    // total amount of tokens available for buying
+    let tokensAvailable = 500000;   // total amount of tokens available for buying
     let numberOfTokensBought = 100;    // number of tokens to buy
 
     // Test if the smart contract is deployed correctly.
