@@ -6,6 +6,8 @@ App = {
     // Loading status of the app.
     loading: false,
 
+    tokenPrice: 0,
+
     // Initializes the app.
     init: async () => {
         await App.initWeb3();
@@ -60,12 +62,8 @@ App = {
         App.contracts.ToniTokenICO.setProvider(App.web3Provider);
         App.contracts.ToniToken.setProvider(App.web3Provider);
         // Get a deployed instance of both contracts.
-        await App.contracts.ToniTokenICO.deployed().then((toniTokenICO) => {
-            console.log(toniTokenICO.address);
-        });
-        await App.contracts.ToniToken.deployed().then((toniToken) => {
-            console.log(toniToken.address);
-        });
+        App.toniTokenICO = await App.contracts.ToniTokenICO.deployed();
+        App.toniToken = await App.contracts.ToniToken.deployed();
     },
 
     // Renders the client side application.
@@ -89,26 +87,41 @@ App = {
         $('#accountAddress').html('Your account:' + App.account);
 
         // Fetch data from the smart contracts.
-        let tokenPrice = await App.contracts.ToniTokenICO.tokenPrice();
-        let tokensSold = await App.contracts.ToniTokenICO.tokensSold();
-        let balance = await App.contracts.ToniToken.balanceOf(App.account);
+        App.tokenPrice = await App.toniTokenICO.tokenPrice();
+        let tokensSold = await App.toniTokenICO.tokensSold();
+        let balance = await App.toniToken.balanceOf(App.account);
         let tokensAvailable = 750000;
 
         // Update the HTML elements with the correct values.
-        $('.token-price').html(web3.utils.fromWei(tokenPrice, 'ether').toNumber());
+        $('.token-price').html(web3.fromWei(App.tokenPrice, 'ether').toNumber());
         $('.tokens-sold').html(tokensSold.toNumber());
-        $('.tokens-available').html((tokensAvailable - tokensSold).toNumber());
+        $('.tokens-available').html(tokensAvailable - tokensSold);
         $('.dapp-balance').html(balance.toNumber());
 
         // Compute and update the progress bar with the correct percentage.
-        let progressPercent = (tokensSold / tokensAvailable).toNumber() * 100;
-        $('#progress').css('width', progressPercent + '%');
+        let progressPercentage = (tokensSold / tokensAvailable) * 100;
+        $('#progress').css('width', progressPercentage + '%');
 
         // Loading status after data is fetched.
         App.loading = false;
         // Hide loader and show the content when dta is available .
         loader.hide();
         content.show();
+    },
+
+    buyTokens: async () => {
+        $('#content').hide();
+        $('#loader').show();
+        let numberOfTokens = $('#numberOfTokens').val();
+        await App.toniTokenICO.buyTokens(numberOfTokens, {
+            from: App.account,
+            value: numberOfTokens * App.tokenPrice,
+            gas: 500000
+        }).then(() => { console.log('tokens bought')});
+        // Reset the form.
+        $('form').trigger('reset');
+        $('#content').show();
+        $('#loader').hide();
     },
 }
 

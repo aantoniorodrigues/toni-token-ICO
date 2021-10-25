@@ -91,11 +91,7 @@ contract('ToniTokenICO', (accounts) => {
         })
 
         // End sale with admin account and get transaction receipt.
-        let transactionReceipt = await this.ToniTokenICO.endSale({ from: admin });
-        // assert.equal(transactionReceipt.logs.length, 1, 'triggers an event');
-        // assert.equal(transactionReceipt.logs[0].event, 'Sell', 'triggers a "Sell" event');
-        // assert.equal(transactionReceipt.logs[0].args._buyer, buyer, 'registers the buyer');
-        // assert.equal(transactionReceipt.logs[0].args._amount, numberOfTokensBought, 'registers the number of tokens sold');
+        await this.ToniTokenICO.endSale({ from: admin });
 
         // Get the admin balance and check if tokens not sold were transfered to admin account.
         let adminBalance = await this.ToniToken.balanceOf(admin);
