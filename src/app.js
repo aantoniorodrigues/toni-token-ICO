@@ -3,10 +3,11 @@ App = {
     contracts: {},
     // Variable to store the user's address.
     account: '0x0',
+    // Loading status of the app.
+    loading: false,
 
     // Initializes the app.
     init: async () => {
-        console.log('App initialized...');
         await App.initWeb3();
         await App.initContracts();
 
@@ -58,7 +59,7 @@ App = {
         // Set the web3 provider.
         App.contracts.ToniTokenICO.setProvider(App.web3Provider);
         App.contracts.ToniToken.setProvider(App.web3Provider);
-        // Fill the smart contract with the real values from the blockchain.
+        // Get a deployed instance of both contracts.
         await App.contracts.ToniTokenICO.deployed().then((toniTokenICO) => {
             console.log(toniTokenICO.address);
         });
@@ -69,10 +70,45 @@ App = {
 
     // Renders the client side application.
     render: async () => {
-        // Load account's data.
+        // Prevent double loading.
+        if (App.loading) {
+            return;
+        }
+
+        // Loading status while data is fetched.
+        App.loading = true;
+        // Variables to store the loader and content HTML elements.
+        let loader = $('#loader');
+        let content = $('#content');
+        // Show loader and hide the content while data is being fetched.
+        loader.show();
+        content.hide();
+
+        // Load the user account's data and displays it when app's not loading.
         App.account = web3.eth.accounts[0];
-        // Display the user's account
         $('#accountAddress').html('Your account:' + App.account);
+
+        // Fetch data from the smart contracts.
+        let tokenPrice = await App.contracts.ToniTokenICO.tokenPrice();
+        let tokensSold = await App.contracts.ToniTokenICO.tokensSold();
+        let balance = await App.contracts.ToniToken.balanceOf(App.account);
+        let tokensAvailable = 750000;
+
+        // Update the HTML elements with the correct values.
+        $('.token-price').html(web3.utils.fromWei(tokenPrice, 'ether').toNumber());
+        $('.tokens-sold').html(tokensSold.toNumber());
+        $('.tokens-available').html((tokensAvailable - tokensSold).toNumber());
+        $('.dapp-balance').html(balance.toNumber());
+
+        // Compute and update the progress bar with the correct percentage.
+        let progressPercent = (tokensSold / tokensAvailable).toNumber() * 100;
+        $('#progress').css('width', progressPercent + '%');
+
+        // Loading status after data is fetched.
+        App.loading = false;
+        // Hide loader and show the content when dta is available .
+        loader.hide();
+        content.show();
     },
 }
 
