@@ -13,6 +13,7 @@ App = {
 		// Call all the necessary methods.
         await App.initWeb3();
         await App.initContracts();
+        await App.listenForEvents();
         await App.render();
     },
 
@@ -66,6 +67,17 @@ App = {
         App.toniToken = await App.contracts.ToniToken.deployed();
     },
 
+    // Listens for emitted events from the smart contract.
+    listenForEvents: async () => {
+        App.toniTokenICO.Sell({}, {     // passed an empty object to not filter anything
+            fromBlock: 0,
+            toBlock: 'latest',
+        }).watch((error, event) => {
+            console.log('event triggered', event);
+            App.render();
+        })
+    },
+
     // Renders the client side application.
     render: async () => {
         // Prevent double loading.
@@ -90,17 +102,14 @@ App = {
         App.tokenPrice = await App.toniTokenICO.tokenPrice();
         let tokensSold = await App.toniTokenICO.tokensSold();
         let balance = await App.toniToken.balanceOf(App.account);
-		console.log(balance.toNumber());
         let tokensAvailable = 500000;
+        let progressPercentage = (tokensSold / tokensAvailable) * 100;
 
         // Update the HTML elements with the correct values.
         $('.token-price').html(web3.fromWei(App.tokenPrice, 'ether').toNumber());
         $('.tokens-sold').html(tokensSold.toNumber());
         $('.tokens-available').html(tokensAvailable - tokensSold);
         $('.toni-token-balance').html(balance.toNumber());
-
-        // Compute and update the progress bar with the correct percentage.
-        let progressPercentage = (tokensSold / tokensAvailable) * 100;
         $('#progress').css('width', progressPercentage + '%');
 
         // Loading status after data is fetched.
@@ -111,20 +120,21 @@ App = {
     },
 
     buyTokens: async () => {
+        // Loading until transaction is complete.
         $('#content').hide();
         $('#loader').show();
+
+        // Get the number of tokens to buy.
         let numberOfTokens = $('#numberOfTokens').val();
+        // Buy the tokens.
         await App.toniTokenICO.buyTokens(numberOfTokens, {
             from: App.account,
             value: numberOfTokens * App.tokenPrice,
             gas: 500000
         }).then(() => { console.log('tokens bought')});
         
-		// Reset the form.
+		// Reset the number of tokens in the form.
         $('form').trigger('reset');
-		// Reload the app's content and hide the loader.
-        $('#content').show();
-        $('#loader').hide();
     },
 }
 
