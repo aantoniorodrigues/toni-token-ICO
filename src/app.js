@@ -114,7 +114,7 @@ App = {
 
         // Loading status after data is fetched.
         App.loading = false;
-        // Hide loader and show the content when dta is available .
+        // Hide loader and show the content when data is available.
         loader.hide();
         content.show();
     },
