@@ -69,11 +69,12 @@ App = {
 
     // Listens for emitted events from the smart contract.
     listenForEvents: async () => {
-        App.toniTokenICO.Sell({}, {     // passed an empty object to not filter anything
+        App.toniTokenICO.Sell({}, {     // passed an empty object so nothing is filtered
             fromBlock: 0,
             toBlock: 'latest',
         }).watch((error, event) => {
             console.log('event triggered', event);
+		    // Re-render the page when transaction is finished.
             App.render();
         })
     },
