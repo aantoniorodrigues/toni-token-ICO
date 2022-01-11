@@ -27,7 +27,10 @@ contract ToniToken {
         uint256 _value
     );
 
-    // Only runs when the contract is deployed.
+    /**
+     * @dev Only runs when the contract is deployed
+     * @param _totalSupply total supply of tokens
+     */
     constructor(uint256 _totalSupply) public {
         // Allocate the initial total supply to the account deploying the contract.
         balanceOf[msg.sender] = _totalSupply;
@@ -35,7 +38,11 @@ contract ToniToken {
         totalSupply = _totalSupply;
     }
 
-    // Transfer tokens from one account to another.
+    /**
+     * @dev Transfers tokens from one account to another
+     * @param _to receiving account's address
+     * @param _value value to be transfered
+     */
     function transfer(address _to, uint256 _value) public returns (bool success) {
         // Throws an exception if the sender doesn't own enough tokens.
         require(balanceOf[msg.sender] >= _value);
@@ -48,7 +55,11 @@ contract ToniToken {
         return true;
     }
 
-    // Approves a delegated transfer.
+    /**
+     * @dev Approves a delegated transfer
+     * @param _spender address of the account authorized to delegate the transaction
+     * @param _value value to be authorized
+     */
     function approve(address _spender, uint256 _value) public returns (bool success) {
         // Set the spender's allowance.
         allowance[msg.sender][_spender] = _value;
@@ -58,7 +69,12 @@ contract ToniToken {
         return true;
     }
 
-    // Transfer tokens on behalf of another account.
+    /**
+     * @dev Transfers tokens on behalf of another account
+     * @param _from address of the account spending the tokens
+     * @param _to address of the account recieving the tokens
+     * @param _value value to be transfered
+     */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         // Throws an exception if the transfer value's greater than the account's balance.
         require(balanceOf[_from] >= _value);

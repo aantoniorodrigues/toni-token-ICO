@@ -22,7 +22,12 @@ contract ToniTokenICO {
         uint256 _amount
     );
 
-    // Only runs when contract is deployed.
+    /**
+     * @dev Only runs when contract is deployed. Sets the admin as the account
+     *      deploying the contract and sets the token contract and price variables
+     * @param _tokenContract token's smart contract
+     * @param _tokenPrice price of a single token (in wei)
+     */
     constructor(ToniToken _tokenContract, uint256 _tokenPrice) public {
         // Administrator will be the account deploying the contract.
         admin = msg.sender;
@@ -32,14 +37,21 @@ contract ToniTokenICO {
         tokenPrice = _tokenPrice;
     }
 
-    // Multiplies two numbers safely in solidity.
-    // Copied from DS-Math library.
-    // https://github.com/dapphub/ds-math
+    /**
+     * @dev Multiplies two numbers safely in solidity.
+     *      Copied from DS-Math library.
+     *      https://github.com/dapphub/ds-math
+     * @param x number to be multiplied
+     * @param y number to be multiplied
+     */
     function multiply(uint x, uint y) internal pure returns (uint z) {
         require(y == 0 || (z = x * y) / y == x);
     }
 
-    // Allows an account to buy a number of tokens.
+    /**
+     * @dev Allows an account to buy a certain number of tokens
+     * @param _numberOfTokens number of tokens being bought
+     */
     function buyTokens(uint256 _numberOfTokens) public payable {    // "payable" to enable ether transactions
         // Correct ether value (in wei) of the required tokens.
         uint256 _correctValue = multiply(_numberOfTokens, tokenPrice);
@@ -58,6 +70,9 @@ contract ToniTokenICO {
         emit Sell(msg.sender, _numberOfTokens);
     }
 
+    /**
+     * @dev Ends the token sale. Can only be called by the admin
+     */
     // Ends the token sale (can only be called by the admin).
     function endSale() public {
         // Throws exception if function is not called by the admin.
